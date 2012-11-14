@@ -1,5 +1,6 @@
 name:  pattern_matching
 description:  A pattern matching library
 dependencies:
-  dart_immutable:
+  persistent:
     git: https://code.google.com/p/dart-immutable/
+

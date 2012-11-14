@@ -18,7 +18,7 @@
 
 library pattern_matching;
 
-import 'package:dart_immutable/dart_immutable.dart';
+import 'package:persistent/persistent.dart';
 
 abstract class Rule {
   Rule operator | (Rule rule) => new _RuleDisjunction(this, rule);
