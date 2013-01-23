@@ -49,7 +49,7 @@ main() {
   // The right-hand side of the first rule that matches (in this case the
   // last one) is executed. "pvar" denote pattern variables.
 
-  match(list).with(
+  match(list).against(
       nil()                        >> (_) { throw "should not happen"; }
     | cons(v.x, nil())             >> (_) { throw "should not happen"; }
     | cons(v.x, cons(eq(1), v.xs)) >> (_) { throw "should not happen"; }
@@ -58,7 +58,7 @@ main() {
 
   // Match returns a value: the value returned by the executed right-hand side.
 
-  final tailOfTail = match(list).with(
+  final tailOfTail = match(list).against(
       cons(v._, cons(v._, v.xs)) >> (e) { return e.xs; } // v._ is a wildcard
   );
   print(tailOfTail); // prints "Cons(3, Nil())"
@@ -67,18 +67,18 @@ main() {
 
   final nonLinear = cons(v.x, cons(v.x, nil()));
 
-  match(new Cons(1, new Cons(2, new Nil()))).with(
+  match(new Cons(1, new Cons(2, new Nil()))).against(
       nonLinear >> (_) { print("bad"); }
     | v._       >> (_) { print("good"); }
   );
-  match(new Cons(1, new Cons(1, new Nil()))).with(
+  match(new Cons(1, new Cons(1, new Nil()))).against(
       nonLinear >> (_) { print("good"); }
   );
 
   // If no branch matches, a MatchFailure is raised.
 
   try {
-    match(list).with(
+    match(list).against(
         nil() >> (_) {  throw "should not happen"; }
     );
   } on MatchFailure catch (_) {
@@ -87,13 +87,13 @@ main() {
 
   // Subpatterns can be aliased with %
 
-  match(list).with(
+  match(list).against(
       cons(v._, v.xs % cons(v._, v.x)) >> (e) { print("${e.xs} ${e.x}"); }
   ); // prints "Cons(2, Cons(3, Nil())) Cons(3, Nil())"
 
   // Guards allow to put extra conditions on patterns.
 
-  match(list).with(
+  match(list).against(
       cons(v.x, v._) & guard((e) => e.x > 1) >> (_) { throw "impossible"; }
                      & otherwise             >> (e) { print("x = ${e.x}"); }
     | nil()                                  >> (_) { throw "impossible"; }
@@ -102,7 +102,7 @@ main() {
   // The obligatory map function.
 
   LList map(Function f, LList xs) =>
-      match(xs).with(
+      match(xs).against(
           nil()           >> (_) { return new Nil(); }
         | cons(v.y, v.ys) >> (e) { return new Cons(f(e.y), map(f, e.ys)); }
       );

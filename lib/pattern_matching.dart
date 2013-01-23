@@ -180,7 +180,7 @@ class MatchFailure {}
 class Matcher<A> {
   final A subject;
   Matcher(this.subject);
-  Object with(Rule rule) {
+  Object against(Rule rule) {
     Option<Object> result = rule.match(subject);
     if (!result.isDefined) throw new MatchFailure();
     return result.value;
@@ -191,7 +191,7 @@ class MatchResult {
   final PersistentMap<String, Object> environment;
   MatchResult(this.environment);
   noSuchMethod(m) {
-    String x = m.memberName.substring(4);
+    String x = m.memberName;
     Option<Object> res = environment.lookup(x);
     if (res.isDefined) return res.value;
     else throw "$x is undefined";
@@ -200,7 +200,7 @@ class MatchResult {
 
 class _VarPatternProvider {
   noSuchMethod(m) {
-    String x = m.memberName.substring(4);
+    String x = m.memberName;
     return (x.startsWith('_')) ? new _WildcardPattern() : new _VarPattern(x);
   }
 }
