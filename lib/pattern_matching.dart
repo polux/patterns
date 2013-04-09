@@ -67,7 +67,7 @@ class _BaseRule extends Rule {
 
   _BaseRule operator &(GuardedRhs rhs) {
     List<GuardedRhs> newRhss = new List<GuardedRhs>.from(rhss);
-    newRhss.addLast(rhs);
+    newRhss.add(rhs);
     return new _BaseRule(this.pattern, newRhss);
   }
 }
