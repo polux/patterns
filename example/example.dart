@@ -50,26 +50,26 @@ main() {
   // last one) is executed. "pvar" denote pattern variables.
 
   match(list).against(
-      nil()                        >> (_) { throw "should not happen"; }
-    | cons(v.x, nil())             >> (_) { throw "should not happen"; }
-    | cons(v.x, cons(eq(1), v.xs)) >> (_) { throw "should not happen"; }
-    | cons(v.x, cons(eq(2), v.xs)) >> (e) { print("match: ${e.x} ${e.xs}"); }
+      nil()                              >> (_) { throw "should not happen"; }
+    | cons(v('x'), nil())                >> (_) { throw "should not happen"; }
+    | cons(v('x'), cons(eq(1), v('xs'))) >> (_) { throw "should not happen"; }
+    | cons(v('x'), cons(eq(2), v('xs'))) >> (e) { print("match: ${e['x']} ${e['xs']}"); }
   ); // prints "match: 1 Cons(3, Nil())"
 
   // Match returns a value: the value returned by the executed right-hand side.
 
   final tailOfTail = match(list).against(
-      cons(v._, cons(v._, v.xs)) >> (e) { return e.xs; } // v._ is a wildcard
+      cons(v('_'), cons(v('_'), v('xs'))) >> (e) { return e['xs']; }  // _ is a wildcard
   );
   print(tailOfTail); // prints "Cons(3, Nil())"
 
   // Non-linear patterns are supported.
 
-  final nonLinear = cons(v.x, cons(v.x, nil()));
+  final nonLinear = cons(v('x'), cons(v('x'), nil()));
 
   match(new Cons(1, new Cons(2, new Nil()))).against(
       nonLinear >> (_) { print("bad"); }
-    | v._       >> (_) { print("good"); }
+    | v('_')    >> (_) { print("good"); }
   );
   match(new Cons(1, new Cons(1, new Nil()))).against(
       nonLinear >> (_) { print("good"); }
@@ -88,23 +88,23 @@ main() {
   // Subpatterns can be aliased with %
 
   match(list).against(
-      cons(v._, v.xs % cons(v._, v.x)) >> (e) { print("${e.xs} ${e.x}"); }
+      cons(v('_'), v('xs') % cons(v('_'), v('x'))) >> (e) { print("${e['xs']} ${e['x']}"); }
   ); // prints "Cons(2, Cons(3, Nil())) Cons(3, Nil())"
 
   // Guards allow to put extra conditions on patterns.
 
   match(list).against(
-      cons(v.x, v._) & guard((e) => e.x > 1) >> (_) { throw "impossible"; }
-                     & otherwise             >> (e) { print("x = ${e.x}"); }
-    | nil()                                  >> (_) { throw "impossible"; }
+      cons(v('x'), v('_')) & guard((e) => e['x'] > 1) >> (_) { throw "impossible"; }
+                           & otherwise                >> (e) { print("x = ${e['x']}"); }
+    | nil()                                           >> (_) { throw "impossible"; }
   ); // prints "x = 1"
 
   // The obligatory map function.
 
   LList map(Function f, LList xs) =>
       match(xs).against(
-          nil()           >> (_) { return new Nil(); }
-        | cons(v.y, v.ys) >> (e) { return new Cons(f(e.y), map(f, e.ys)); }
+          nil()                 >> (_) { return new Nil(); }
+        | cons(v('y'), v('ys')) >> (e) { return new Cons(f(e['y']), map(f, e['ys'])); }
       );
   print(map((n) => n + 1, list));
 }

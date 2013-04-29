@@ -138,7 +138,12 @@ class _ConstructorPattern<A> extends OPattern<A> {
   }
 }
 
-class _VarPattern<A> extends OPattern<A> {
+/// A pattern that can be used to alias another pattern
+abstract class _VarLikePattern<A> extends OPattern<A> {
+  OPattern<A> operator % (OPattern<A> pattern);
+}
+
+class _VarPattern<A> extends _VarLikePattern<A> {
   final String varName;
 
   _VarPattern(this.varName);
@@ -170,9 +175,11 @@ class _AliasPattern<A> extends OPattern<A> {
   }
 }
 
-class _WildcardPattern<A> extends OPattern<A> {
+class _WildcardPattern<A> extends _VarLikePattern<A> {
   Option<PersistentMap<Object,Object>> match(A subject) =>
       new Option.some(new PersistentMap());
+
+  OPattern<A> operator % (OPattern<A> pattern) => pattern;
 }
 
 class MatchFailure {}
@@ -190,18 +197,10 @@ class Matcher<A> {
 class MatchResult {
   final PersistentMap<String, Object> environment;
   MatchResult(this.environment);
-  noSuchMethod(m) {
-    String x = m.memberName;
+  operator [](String x) {
     Option<Object> res = environment.lookup(x);
     if (res.isDefined) return res.value;
     else throw "$x is undefined";
-  }
-}
-
-class _VarPatternProvider {
-  noSuchMethod(m) {
-    String x = m.memberName;
-    return (x.startsWith('_')) ? new _WildcardPattern() : new _VarPattern(x);
   }
 }
 
@@ -221,4 +220,5 @@ Guard guard(bool pred(MatchResult res)) => new Guard(pred);
 bool _constTrue(_) => true; // Closures inside initializers not implemented
 final Guard otherwise = guard(_constTrue);
 
-final v = new _VarPatternProvider();
+_VarLikePattern v(String x) =>
+    x == '_' ? new _WildcardPattern() : new _VarPattern(x);
