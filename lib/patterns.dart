@@ -16,7 +16,7 @@
 //   Paul Brauner (polux@google.com)
 //   Burak Emir (bqe@google.com)
 
-library pattern_matching;
+library patterns;
 
 import 'package:persistent/persistent.dart';
 

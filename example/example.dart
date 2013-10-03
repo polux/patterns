@@ -14,7 +14,7 @@
 
 // Author: Paul Brauner (polux@google.com)
 
-import 'package:pattern_matching/pattern_matching.dart';
+import 'package:patterns/patterns.dart';
 import 'package:persistent/persistent.dart';
 
 // We define linked lists.
