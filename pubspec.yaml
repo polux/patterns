@@ -1,4 +1,7 @@
 name: patterns
+version: 0.0.1
+author: Paul Brauner <polux@google.com>
 description: A pattern matching library
+homepage: https://github.com/polux/patterns
 dependencies:
   persistent: any
