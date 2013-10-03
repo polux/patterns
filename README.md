@@ -5,8 +5,8 @@ patterns and rules. The only doc so far is that quick demo, but it demoes all
 the features of the library.
 
 ```dart
-import 'package:pattern_matching/pattern_matching.dart';
-import 'package:dart_immutable/dart_immutable.dart';
+import 'package:patterns/patterns.dart';
+import 'package:persistent/persistent.dart';
 
 // We define linked lists.
 
@@ -40,36 +40,36 @@ main() {
   // The right-hand side of the first rule that matches (in this case the
   // last one) is executed. "pvar" denote pattern variables.
 
-  match(list).with(
-      nil()                        >> (_) { throw "should not happen"; }
-    | cons(v.x, nil())             >> (_) { throw "should not happen"; }
-    | cons(v.x, cons(eq(1), v.xs)) >> (_) { throw "should not happen"; }
-    | cons(v.x, cons(eq(2), v.xs)) >> (e) { print("match: ${e.x} ${e.xs}"); }
+  match(list).against(
+      nil()                              >> (_) { throw "should not happen"; }
+    | cons(v('x'), nil())                >> (_) { throw "should not happen"; }
+    | cons(v('x'), cons(eq(1), v('xs'))) >> (_) { throw "should not happen"; }
+    | cons(v('x'), cons(eq(2), v('xs'))) >> (e) { print("match: ${e['x']} ${e['xs']}"); }
   ); // prints "match: 1 Cons(3, Nil())"
 
   // Match returns a value: the value returned by the executed right-hand side.
 
-  final tailOfTail = match(list).with(
-      cons(v._, cons(v._, v.xs)) >> (e) { return e.xs; } // v._ is a wildcard
+  final tailOfTail = match(list).against(
+      cons(v('_'), cons(v('_'), v('xs'))) >> (e) { return e['xs']; }  // _ is a wildcard
   );
   print(tailOfTail); // prints "Cons(3, Nil())"
 
   // Non-linear patterns are supported.
 
-  final nonLinear = cons(v.x, cons(v.x, nil()));
+  final nonLinear = cons(v('x'), cons(v('x'), nil()));
 
-  match(new Cons(1, new Cons(2, new Nil()))).with(
+  match(new Cons(1, new Cons(2, new Nil()))).against(
       nonLinear >> (_) { print("bad"); }
-    | v._       >> (_) { print("good"); }
+    | v('_')    >> (_) { print("good"); }
   );
-  match(new Cons(1, new Cons(1, new Nil()))).with(
+  match(new Cons(1, new Cons(1, new Nil()))).against(
       nonLinear >> (_) { print("good"); }
   );
 
   // If no branch matches, a MatchFailure is raised.
 
   try {
-    match(list).with(
+    match(list).against(
         nil() >> (_) {  throw "should not happen"; }
     );
   } on MatchFailure catch (_) {
@@ -78,24 +78,24 @@ main() {
 
   // Subpatterns can be aliased with %
 
-  match(list).with(
-      cons(v._, v.xs % cons(v._, v.x)) >> (e) { print("${e.xs} ${e.x}"); }
+  match(list).against(
+      cons(v('_'), v('xs') % cons(v('_'), v('x'))) >> (e) { print("${e['xs']} ${e['x']}"); }
   ); // prints "Cons(2, Cons(3, Nil())) Cons(3, Nil())"
 
   // Guards allow to put extra conditions on patterns.
 
-  match(list).with(
-      cons(v.x, v._) & guard((e) => e.x > 1) >> (_) { throw "impossible"; }
-                     & otherwise             >> (e) { print("x = ${e.x}"); }
-    | nil()                                  >> (_) { throw "impossible"; }
+  match(list).against(
+      cons(v('x'), v('_')) & guard((e) => e['x'] > 1) >> (_) { throw "impossible"; }
+                           & otherwise                >> (e) { print("x = ${e['x']}"); }
+    | nil()                                           >> (_) { throw "impossible"; }
   ); // prints "x = 1"
 
   // The obligatory map function.
 
   LList map(Function f, LList xs) =>
-      match(xs).with(
-          nil()           >> (_) { return new Nil(); }
-        | cons(v.y, v.ys) >> (e) { return new Cons(f(e.y), map(f, e.ys)); }
+      match(xs).against(
+          nil()                 >> (_) { return new Nil(); }
+        | cons(v('y'), v('ys')) >> (e) { return new Cons(f(e['y']), map(f, e['ys'])); }
       );
   print(map((n) => n + 1, list));
 }
