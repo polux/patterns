@@ -1,4 +1,4 @@
-name: pattern_matching
+name: patterns
 description: A pattern matching library
 dependencies:
   persistent: any
