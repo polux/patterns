@@ -103,7 +103,9 @@ main() {
 
 ## Try it!
 
+```
 git clone https://github.com/polux/patterns
 cd patterns
 pub install
 dart example/example.dart
+```
