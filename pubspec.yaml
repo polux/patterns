@@ -4,4 +4,4 @@ author: Paul Brauner <polux@google.com>
 description: A pattern matching library
 homepage: https://github.com/polux/patterns
 dependencies:
-  persistent: any
+  persistent: '>=0.7.5 <0.8.0'
